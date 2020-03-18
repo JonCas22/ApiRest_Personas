@@ -25,8 +25,6 @@ namespace ApiRest_Personas.Controllers
         private List<Users> users = new List<Users>{};
         private readonly masterContext _context;
 
-        // TRAEMOS EL OBJETO DE CONFIGURACIÓN (appsettings.json)
-        // MEDIANTE INYECCIÓN DE DEPENDENCIAS.
         public LoginController(IConfiguration configuration, masterContext context)
         {
             this.configuration = configuration;
@@ -38,7 +36,8 @@ namespace ApiRest_Personas.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(UserLogin usuarioLogin)
         {
-            var _userInfo = await AutenticarUsuarioAsync(usuarioLogin.Usuario, usuarioLogin.Password);
+            Console.WriteLine("Usuario Login es=>" + usuarioLogin.Username + " con contraseña=>" + usuarioLogin.Password);
+            var _userInfo = await AutenticarUsuarioAsync(usuarioLogin.Username, usuarioLogin.Password);
             if (_userInfo != null)
             {
                 return Ok(new { token = GenerarTokenJWT(_userInfo) });
@@ -54,29 +53,23 @@ namespace ApiRest_Personas.Controllers
         {
             // AQUÍ LA LÓGICA DE AUTENTICACIÓN //
 
-
-            // Supondremos que el Usuario existe en la Base de Datos.
-            // Retornamos un objeto del tipo UsuarioInfo, con toda
-            // la información del usuario necesaria para el Token.
             var search = await _context.Users.FirstOrDefaultAsync(u => u.Username == usuario && u.Password == password);
-            Console.WriteLine(search);
-            Console.WriteLine(usuario);
-            Console.WriteLine(password);
+            Console.WriteLine("Search=> " + search);
+            if (search!=null)
+            {
+                Console.WriteLine(search);
+
+            }
+            else
+            {
+                Console.WriteLine("Usuario no encontrado");
+            }
+
+            if (usuario != null) { Console.WriteLine(usuario); } else { Console.WriteLine("Nombre no encontrado"); }
+            if (password != null) { Console.WriteLine(password); } else { Console.WriteLine("Password no encontrado"); }
+
             return search;
             
-            /*return new Users()
-            {
-                // Id del Usuario en el Sistema de Información (BD)
-                Id = 22,
-                FirstName = "Nombre Usuario",
-                LastName = "Apellidos Usuario",
-                Username = "email.usuario@dominio.com",
-                Rol = "Administrador"
-            };*/
-
-            // Supondremos que el Usuario NO existe en la Base de Datos.
-            // Retornamos NULL.
-            //return null;
         }
 
         // GENERAMOS EL TOKEN CON LA INFORMACIÓN DEL USUARIO
