@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Prueba.Models
+namespace ApiRest_Personas.Models
 {
     public partial class Personas
     {

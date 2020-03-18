@@ -1,6 +1,6 @@
 ﻿using System;
+using ApiRest_Personas.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace Prueba.Models
 {
@@ -16,6 +16,8 @@ namespace Prueba.Models
         }
 
         public virtual DbSet<Personas> Personas { get; set; }
+
+        public virtual DbSet<Users> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -45,6 +47,44 @@ namespace Prueba.Models
                     .HasColumnName("province")
                     .HasMaxLength(100)
                     .IsUnicode(false); ;
+            });
+            
+            //Users modelBuilder
+            
+            modelBuilder.Entity<Users>(entity =>
+            {
+                entity.ToTable("users");
+
+                entity.Property(e => e.Id).HasColumnName("id");
+
+                entity.Property(e => e.FirstName)
+                    .IsRequired()
+                    .HasColumnName("firstname")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.LastName)
+                    .IsRequired()
+                    .HasColumnName("lastname")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Username).HasColumnName("username")
+                    .IsRequired()
+                    .HasColumnName("username")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Password).HasColumnName("password")
+                    .IsRequired()
+                    .HasColumnName("password")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
+                entity.Property(e => e.Rol).HasColumnName("rol")
+                    .IsRequired()
+                    .HasColumnName("rol")
+                    .HasMaxLength(50)
+                    .IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);

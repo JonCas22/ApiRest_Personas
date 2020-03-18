@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -11,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Prueba.Models;
 
 namespace ApiRest_Personas
@@ -29,6 +32,25 @@ namespace ApiRest_Personas
         {
             var connection = Configuration.GetConnectionString("PersonaDatabase");
             services.AddDbContext<masterContext>(options => options.UseSqlServer(connection));
+
+            // CONFIGURACIÓN DEL SERVICIO DE AUTENTICACIÓN JWT
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["JWT:Issuer"],
+                        ValidAudience = Configuration["JWT:Audience"],
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(Configuration["JWT:ClaveSecreta"])
+                        )
+                    };
+                });
+
 
             services.AddCors(options =>
             {
@@ -54,6 +76,10 @@ namespace ApiRest_Personas
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            // AÑADIMOS EL MIDDLEWARE DE AUTENTICACIÓN
+            // DE USUARIOS AL PIPELINE DE ASP.NET CORE
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
