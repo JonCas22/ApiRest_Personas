@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ApiRest_Personas.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Prueba.Models;
 
 namespace ApiRest_Personas
@@ -51,6 +53,13 @@ namespace ApiRest_Personas
                     };
                 });
 
+            // configure DI for application services
+            services.AddTransient<IUserRepository, UserRepository>();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+            });
 
             services.AddCors(options =>
             {
@@ -72,6 +81,17 @@ namespace ApiRest_Personas
             }
 
             app.UseCors("CorsPolicy");
+
+            // Crea un middleware para exponer la documentación en el JSON.
+            app.UseSwagger();
+            // Crea  un middleware para exponer el UI (HTML, JS, CSS, etc.),
+            // Especificamos en que endpoint buscara el json.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.RoutePrefix = string.Empty;
+            }); 
+
 
             app.UseHttpsRedirection();
 

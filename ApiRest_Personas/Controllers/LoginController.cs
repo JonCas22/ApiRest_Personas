@@ -5,6 +5,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using ApiRest_Personas.Data;
 using ApiRest_Personas.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -21,14 +22,16 @@ namespace ApiRest_Personas.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IConfiguration configuration;
+        private readonly IUserRepository _UserRepository;
 
         private List<Users> users = new List<Users>{};
         private readonly masterContext _context;
 
-        public LoginController(IConfiguration configuration, masterContext context)
+        public LoginController(IConfiguration configuration, IUserRepository UserRepository, masterContext context)
         {
             this.configuration = configuration;
             _context = context;
+            _UserRepository = UserRepository;
         }
 
         // POST: api/Login
@@ -37,7 +40,7 @@ namespace ApiRest_Personas.Controllers
         public async Task<IActionResult> Login(UserLogin usuarioLogin)
         {
             Console.WriteLine("Usuario Login es=>" + usuarioLogin.Username + " con contraseña=>" + usuarioLogin.Password);
-            var _userInfo = await AutenticarUsuarioAsync(usuarioLogin.Username, usuarioLogin.Password);
+            var _userInfo = await _UserRepository.AutenticarUsuarioAsync(usuarioLogin.Username, usuarioLogin.Password);
             if (_userInfo != null)
             {
                 return Ok(new { token = GenerarTokenJWT(_userInfo) });
@@ -46,30 +49,6 @@ namespace ApiRest_Personas.Controllers
             {
                 return Unauthorized();
             }
-        }
-
-        // COMPROBAMOS SI EL USUARIO EXISTE EN LA BASE DE DATOS 
-        private async Task<Users> AutenticarUsuarioAsync(string usuario, string password)
-        {
-            // AQUÍ LA LÓGICA DE AUTENTICACIÓN //
-
-            var search = await _context.Users.FirstOrDefaultAsync(u => u.Username == usuario && u.Password == password);
-            Console.WriteLine("Search=> " + search);
-            if (search!=null)
-            {
-                Console.WriteLine(search);
-
-            }
-            else
-            {
-                Console.WriteLine("Usuario no encontrado");
-            }
-
-            if (usuario != null) { Console.WriteLine(usuario); } else { Console.WriteLine("Nombre no encontrado"); }
-            if (password != null) { Console.WriteLine(password); } else { Console.WriteLine("Password no encontrado"); }
-
-            return search;
-            
         }
 
         // GENERAMOS EL TOKEN CON LA INFORMACIÓN DEL USUARIO
