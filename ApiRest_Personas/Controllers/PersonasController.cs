@@ -7,11 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ApiRest_Personas.Models;
 using Prueba.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApiRest_Personas.Controllers
 {
+    [Authorize]
     [Route("/personas")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class PersonasController : ControllerBase
     {
         private readonly masterContext _context;

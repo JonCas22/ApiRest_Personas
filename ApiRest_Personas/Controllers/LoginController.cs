@@ -19,6 +19,7 @@ namespace ApiRest_Personas.Controllers
 {
     [Route("/login")]
     [ApiController]
+    [ApiVersion("1.0")]
     public class LoginController : ControllerBase
     {
         private readonly IConfiguration configuration;
@@ -39,7 +40,7 @@ namespace ApiRest_Personas.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(UserLogin usuarioLogin)
         {
-            Console.WriteLine("Usuario Login es=>" + usuarioLogin.Username + " con contraseña=>" + usuarioLogin.Password);
+            Console.WriteLine("Usuario Login es=> (" + usuarioLogin.Username + ") con contraseña=> (" + usuarioLogin.Password + ")");
             var _userInfo = await _UserRepository.AutenticarUsuarioAsync(usuarioLogin.Username, usuarioLogin.Password);
             if (_userInfo != null)
             {

@@ -11,9 +11,11 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ApiRest_Personas.Controllers
 {
-
+    [Authorize]
     [Route("/users")]
     [ApiController]
+    [ApiVersion("1.0")]
+    [ApiVersion("1.1")]
     public class UsersController : ControllerBase
     {
         private readonly masterContext _context;
@@ -28,6 +30,13 @@ namespace ApiRest_Personas.Controllers
         public async Task<ActionResult<IEnumerable<Users>>> GetUsers()
         {
             return await _context.Users.ToListAsync();
+        }
+
+        [HttpGet]
+        [MapToApiVersion("1.1")] // v1.1 specific action for GET api/values endpoint
+        public ActionResult<IEnumerable<string>> GetV1_1()
+        {
+            return new string[] { "version 1.1 value 1", "version 1.1 value2 " };
         }
 
         // GET: api/Users/5
