@@ -24,14 +24,14 @@ namespace ApiRest_Personas.Controllers
             _context = context;
         }
 
-        // GET: api/Personas
+        // GET: api/Personas1
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Personas>>> GetPersonas()
         {
             return await _context.Personas.ToListAsync();
         }
 
-        // GET: api/Personas/5
+        // GET: api/Personas1/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Personas>> GetPersonas(long id)
         {
@@ -45,12 +45,16 @@ namespace ApiRest_Personas.Controllers
             return personas;
         }
 
-        // PUT: api/Personas/5
+        // PUT: api/Personas1/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPut]
-        public async Task<ActionResult<IEnumerable<Personas>>> PutPersonas(Personas personas)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutPersonas(long id, Personas personas)
         {
+            if (id != personas.Id)
+            {
+                return BadRequest();
+            }
 
             _context.Entry(personas).State = EntityState.Modified;
 
@@ -60,27 +64,34 @@ namespace ApiRest_Personas.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                 throw;
+                if (!PersonasExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
             }
 
-            return await _context.Personas.ToListAsync();
+            return NoContent();
         }
 
-        // POST: api/Personas
+        // POST: api/Personas1
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<IEnumerable<Personas>>> PostPersonas(Personas personas)
+        public async Task<ActionResult<Personas>> PostPersonas(Personas personas)
         {
             _context.Personas.Add(personas);
             await _context.SaveChangesAsync();
 
-            return await _context.Personas.ToListAsync();
+            return CreatedAtAction("GetPersonas", new { id = personas.Id }, personas);
         }
 
-        // DELETE: api/Personas/5
+        // DELETE: api/Personas1/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<IEnumerable<Personas>>> DeletePersonas(long id)
+        public async Task<ActionResult<Personas>> DeletePersonas(long id)
         {
             var personas = await _context.Personas.FindAsync(id);
             if (personas == null)
@@ -91,7 +102,7 @@ namespace ApiRest_Personas.Controllers
             _context.Personas.Remove(personas);
             await _context.SaveChangesAsync();
 
-            return await _context.Personas.ToListAsync();
+            return personas;
         }
 
         private bool PersonasExists(long id)

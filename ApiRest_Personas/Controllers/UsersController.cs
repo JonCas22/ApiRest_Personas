@@ -56,9 +56,15 @@ namespace ApiRest_Personas.Controllers
         // PUT: api/Users/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
-        [HttpPut]
-        public async Task<ActionResult<IEnumerable<Users>>> PutUsers(Users users)
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutUsers(long id, Users users)
         {
+            if (id != users.Id)
+            {
+                return BadRequest();
+            }
+
+            Console.WriteLine("The id is" + id);
 
             _context.Entry(users).State = EntityState.Modified;
 
@@ -68,28 +74,34 @@ namespace ApiRest_Personas.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                throw;
-                
+                if (!UsersExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
             }
 
-            return await _context.Users.ToListAsync();
+            return NoContent();
         }
 
         // POST: api/Users
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for
         // more details see https://aka.ms/RazorPagesCRUD.
         [HttpPost]
-        public async Task<ActionResult<IEnumerable<Users>>> PostUsers(Users users)
+        public async Task<ActionResult<Users>> PostUsers(Users users)
         {
             _context.Users.Add(users);
             await _context.SaveChangesAsync();
 
-            return await _context.Users.ToListAsync();
+            return CreatedAtAction("GetUsers", new { id = users.Id }, users);
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<IEnumerable<Users>>> DeleteUsers(long id)
+        public async Task<ActionResult<Users>> DeleteUsers(long id)
         {
             var users = await _context.Users.FindAsync(id);
             if (users == null)
@@ -100,7 +112,7 @@ namespace ApiRest_Personas.Controllers
             _context.Users.Remove(users);
             await _context.SaveChangesAsync();
 
-            return await _context.Users.ToListAsync(); ;
+            return users;
         }
 
         private bool UsersExists(long id)
