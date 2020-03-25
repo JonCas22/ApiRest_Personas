@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ApiRest_Personas.Models;
-using Prueba.Models;
 using Microsoft.AspNetCore.Authorization;
+using ApiRest_Personas.Application;
 
 namespace ApiRest_Personas.Controllers
 {
@@ -17,25 +14,26 @@ namespace ApiRest_Personas.Controllers
     [ApiVersion("1.0")]
     public class PersonasController : ControllerBase
     {
-        private readonly masterContext _context;
+        //private readonly MasterContext _context;
+        private readonly IPersonaService _personaService;
 
-        public PersonasController(masterContext context)
+        public PersonasController(IPersonaService personaService)
         {
-            _context = context;
+            _personaService = personaService;
         }
 
         // GET: api/Personas1
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Personas>>> GetPersonas()
+        public async Task<IEnumerable<Personas>> GetPersonas()
         {
-            return await _context.Personas.ToListAsync();
+            return await _personaService.GetAllPersonas();
         }
 
         // GET: api/Personas1/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Personas>> GetPersonas(long id)
         {
-            var personas = await _context.Personas.FindAsync(id);
+            var personas = await _personaService.GetPersonaById(id);
 
             if (personas == null)
             {
@@ -56,11 +54,10 @@ namespace ApiRest_Personas.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(personas).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _personaService.PutPersona(id, personas);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -83,8 +80,7 @@ namespace ApiRest_Personas.Controllers
         [HttpPost]
         public async Task<ActionResult<Personas>> PostPersonas(Personas personas)
         {
-            _context.Personas.Add(personas);
-            await _context.SaveChangesAsync();
+            await _personaService.PostPersona(personas);
 
             return CreatedAtAction("GetPersonas", new { id = personas.Id }, personas);
         }
@@ -93,21 +89,18 @@ namespace ApiRest_Personas.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Personas>> DeletePersonas(long id)
         {
-            var personas = await _context.Personas.FindAsync(id);
+            var personas = await _personaService.DeletePersona(id);
             if (personas == null)
             {
                 return NotFound();
             }
-
-            _context.Personas.Remove(personas);
-            await _context.SaveChangesAsync();
 
             return personas;
         }
 
         private bool PersonasExists(long id)
         {
-            return _context.Personas.Any(e => e.Id == id);
+            return _personaService.PersonasExists(id);
         }
     }
 }

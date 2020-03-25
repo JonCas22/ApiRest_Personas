@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ApiRest_Personas.Infrastructure\ApiRest_Personas.Infrastructure.csproj" />
+    <ProjectReference Include="..\ApiRest_Personas.Models\ApiRest_Personas.Models.csproj" />
+  </ItemGroup>
+
+</Project>

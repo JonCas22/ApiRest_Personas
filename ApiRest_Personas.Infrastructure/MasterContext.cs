@@ -1,16 +1,15 @@
-﻿using System;
-using ApiRest_Personas.Models;
+﻿using ApiRest_Personas.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Prueba.Models
 {
-    public partial class masterContext : DbContext
+    public partial class MasterContext : DbContext
     {
-        public masterContext()
+        public MasterContext()
         {
         }
 
-        public masterContext(DbContextOptions<masterContext> options)
+        public MasterContext(DbContextOptions<MasterContext> options)
             : base(options)
         {
         }

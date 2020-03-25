@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ApiRest_Personas.Models;
-using Prueba.Models;
 using Microsoft.AspNetCore.Authorization;
+using ApiRest_Personas.Application;
 
 namespace ApiRest_Personas.Controllers
 {
@@ -18,18 +17,19 @@ namespace ApiRest_Personas.Controllers
     [ApiVersion("1.1")]
     public class UsersController : ControllerBase
     {
-        private readonly masterContext _context;
+        //private readonly MasterContext _context;
+        private readonly IUserService _userService;
 
-        public UsersController(masterContext context)
+        public UsersController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
         // GET: api/Users
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Users>>> GetUsers()
+        public async Task<IEnumerable<Users>> GetUsers()
         {
-            return await _context.Users.ToListAsync();
+            return await _userService.GetAllUsers();
         }
 
         [HttpGet]
@@ -43,7 +43,7 @@ namespace ApiRest_Personas.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Users>> GetUsers(long id)
         {
-            var users = await _context.Users.FindAsync(id);
+            var users = await _userService.GetUserById(id);
 
             if (users == null)
             {
@@ -66,11 +66,9 @@ namespace ApiRest_Personas.Controllers
 
             Console.WriteLine("The id is" + id);
 
-            _context.Entry(users).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await _userService.PutUser(id, users);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -93,8 +91,7 @@ namespace ApiRest_Personas.Controllers
         [HttpPost]
         public async Task<ActionResult<Users>> PostUsers(Users users)
         {
-            _context.Users.Add(users);
-            await _context.SaveChangesAsync();
+            await _userService.PostUser(users);
 
             return CreatedAtAction("GetUsers", new { id = users.Id }, users);
         }
@@ -103,21 +100,18 @@ namespace ApiRest_Personas.Controllers
         [HttpDelete("{id}")]
         public async Task<ActionResult<Users>> DeleteUsers(long id)
         {
-            var users = await _context.Users.FindAsync(id);
+            var users = await _userService.DeleteUser(id);
             if (users == null)
             {
                 return NotFound();
             }
-
-            _context.Users.Remove(users);
-            await _context.SaveChangesAsync();
 
             return users;
         }
 
         private bool UsersExists(long id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _userService.UsersExists(id);
         }
     }
 }

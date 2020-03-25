@@ -1,8 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using ApiRest_Personas.Application;
 using ApiRest_Personas.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -13,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Prueba.Models;
@@ -33,7 +29,7 @@ namespace ApiRest_Personas
         public void ConfigureServices(IServiceCollection services)
         {
             var connection = Configuration.GetConnectionString("PersonaDatabase");
-            services.AddDbContext<masterContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<MasterContext>(options => options.UseSqlServer(connection));
 
             // CONFIGURACIÓN DEL SERVICIO DE AUTENTICACIÓN JWT
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -65,6 +61,9 @@ namespace ApiRest_Personas
 
             // configure DI for application services
             services.AddTransient<IUserRepository, UserRepository>();
+
+            services.AddTransient<IUserService, UserService>();
+            services.AddTransient<IPersonaService, PersonaServices>();
 
             services.AddSwaggerGen(c =>
             {

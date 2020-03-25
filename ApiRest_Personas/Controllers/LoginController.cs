@@ -26,9 +26,9 @@ namespace ApiRest_Personas.Controllers
         private readonly IUserRepository _UserRepository;
 
         private List<Users> users = new List<Users>{};
-        private readonly masterContext _context;
+        private readonly MasterContext _context;
 
-        public LoginController(IConfiguration configuration, IUserRepository UserRepository, masterContext context)
+        public LoginController(IConfiguration configuration, IUserRepository UserRepository, MasterContext context)
         {
             this.configuration = configuration;
             _context = context;

@@ -10,9 +10,9 @@ namespace ApiRest_Personas.Data
 {
     public class UserRepository : IUserRepository
     {
-        private readonly masterContext _context;
+        private readonly MasterContext _context;
 
-        public UserRepository(masterContext context)
+        public UserRepository(MasterContext context)
         {
             _context = context;
         }
