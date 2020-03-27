@@ -1,4 +1,6 @@
-﻿using ApiRest_Personas.Models;
+﻿using ApiRest_Personas.Data;
+using ApiRest_Personas.Models;
+using ApiRest_Personas.Repository;
 using Microsoft.EntityFrameworkCore;
 using Prueba.Models;
 using System;
@@ -11,65 +13,55 @@ namespace ApiRest_Personas.Application
 {
     public class PersonaServices : IPersonaService
     {
-        private readonly MasterContext _context;
+        private IPersonaRepository _personaRepository;
 
-        public PersonaServices(MasterContext masterContext)
+
+        public PersonaServices(IPersonaRepository personaRepository)
         {
-            _context = masterContext;
+            _personaRepository = personaRepository;
         }
 
         public async Task<IEnumerable<Personas>> GetAllPersonas()
         {
-            return await _context.Personas.ToListAsync();
+            return await _personaRepository.FindAll();
 
         }
 
         public async Task<Personas> GetPersonaById(long id)
         {
-            var persona = await _context.Personas.FindAsync(id);
+            var persona = await _personaRepository.GetById(id);
 
-            return persona;
+            return persona.Result;
         }
 
         public async Task<Personas> PostPersona(Personas personas)
         {
-            _context.Personas.Add(personas);
-            await _context.SaveChangesAsync();
+            await _personaRepository.Create(personas);
 
-            return await _context.Personas.FindAsync(personas.Id);
+            return await _personaRepository.GetById(personas.Id).Result;
         }
 
         public async Task<Personas> PutPersona(long id, Personas personas)
         {
-            Console.WriteLine("The id is" + id);
+            await _personaRepository.Update(personas);
 
-            _context.Entry(personas).State = EntityState.Modified;
+            return await _personaRepository.GetById(id).Result;
 
-            try
-            {
-               await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                throw;
-            }
-
-            return await _context.Personas.FindAsync(id);
         }
 
         public async Task<Personas> DeletePersona(long id)
         {
-            var persona = await _context.Personas.FindAsync(id);
+            var persona = await (_personaRepository.GetById(id)).Result;
 
-            _context.Personas.Remove(persona);
-            await _context.SaveChangesAsync();
+            await _personaRepository.Delete(persona);
 
             return persona;
         }
 
         public bool PersonasExists(long id)
         {
-            return _context.Personas.Any(e => e.Id == id);
+            //return _context.Personas.Any(e => e.Id == id);
+            return false;
         }
     }
 }

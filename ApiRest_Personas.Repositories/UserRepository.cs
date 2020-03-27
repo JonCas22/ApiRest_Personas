@@ -1,22 +1,22 @@
 ﻿using ApiRest_Personas.Models;
+using ApiRest_Personas.Repository;
 using Microsoft.EntityFrameworkCore;
 using Prueba.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace ApiRest_Personas.Data
 {
-    public class UserRepository : IUserRepository
+    public class UserRepository : RepositoryBase<Users>, IUserRepository
     {
         private readonly MasterContext _context;
 
-        public UserRepository(MasterContext context)
-        {
+        public UserRepository(MasterContext context) : base(context){
             _context = context;
         }
-
 
         public async Task<Users> AutenticarUsuarioAsync(string usuario, string password)
         {

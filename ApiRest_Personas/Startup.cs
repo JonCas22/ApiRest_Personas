@@ -1,6 +1,7 @@
 using System.Text;
 using ApiRest_Personas.Application;
 using ApiRest_Personas.Data;
+using ApiRest_Personas.Repository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -61,6 +62,7 @@ namespace ApiRest_Personas
 
             // configure DI for application services
             services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IPersonaRepository, PersonaRepository>();
 
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IPersonaService, PersonaServices>();
